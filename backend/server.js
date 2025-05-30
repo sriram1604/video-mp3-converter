@@ -34,6 +34,9 @@ app.post("/upload", (req, res) => {
     .input(inputStream)
     .inputFormat(ext)
     .toFormat("mp3")
+    .audioCodec("libmp3lame")
+    .audioBitrate("128k")
+    .outputOptions("-preset ultrafast")
     .on("error", (err) => {
       console.error("FFmpeg error:", err.message);
       if (!responseSent) {

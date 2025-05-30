@@ -25,23 +25,31 @@ app.post("/upload", (req, res) => {
   const inputStream = Readable.from(videoFile.data);
   const ext = videoFile.name.split(".").pop().toLowerCase();
 
+  let responseSent = false; // 👈 Track if response was already sent
 
   res.setHeader("Content-Type", "audio/mpeg");
   res.setHeader("Content-Disposition", "inline; filename=converted.mp3");
 
-  ffmpeg()
+  const ffmpegCommand = ffmpeg()
     .input(inputStream)
     .inputFormat(ext)
     .toFormat("mp3")
     .on("error", (err) => {
       console.error("FFmpeg error:", err.message);
-      res.status(500).send("Conversion failed.");
+      if (!responseSent) {
+        responseSent = true;
+        // Don't try res.status if streaming has started
+        res.end(); // Just close the stream if partially sent
+      }
     })
     .on("end", () => {
       console.log("Conversion successful");
-    })
-    .pipe(res, { end: true });
+      responseSent = true; // ✅ Mark response complete
+    });
+
+  ffmpegCommand.pipe(res, { end: true });
 });
+
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "frontend", "dist"))); // or "build" for CRA
   app.get("*", (req, res) => {

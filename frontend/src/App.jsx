@@ -17,6 +17,7 @@ function App() {
   const [downloadURL, setDownloadURL] = useState(null);
   const [showDownloadButton, setShowDownloadButton] = useState(false);
   const [fileName, setFileName] = useState("");
+  const [clickLoad, setClickLoad] = useState(false);
 
   useEffect(() => {
     const timer1 = setTimeout(() => setAnimateHeading(true), 2000);
@@ -62,6 +63,7 @@ const handleFileChange = (e) => {
     if (!file) return openDialog("Please select a video file first!");
     setFileToConvert(file);
     setFilenameDialogOpen(true);
+    setClickLoad(true);
   };
 
   const handleFilenameSubmit = async (name) => {
@@ -91,6 +93,7 @@ const handleFileChange = (e) => {
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
       setDownloadURL(url);
+      setClickLoad(false);
       setShowDownloadButton(true);
     } catch (error) {
       openDialog("Something went wrong. Check your server and try again.");
@@ -110,7 +113,7 @@ const handleFileChange = (e) => {
       </h1>
       {!showContent && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-          <Loader />
+          <Loader name = "first"/>
         </div>
       )}
 
@@ -144,6 +147,15 @@ const handleFileChange = (e) => {
             Convert to MP3
           </button>
         )}
+        {!showDownloadButton && clickLoad && 
+          <div className="text-center mt-4">
+            <p className="mb-2 text-black font-semibold">
+              Hold up... your music is cooking! 🔥 Give it a sec to drop the music 🎧🎶
+            </p>
+            <Loader name = "loadmp3"/>
+          </div>
+        
+        }
 
         {showDownloadButton && (
           <div className="text-center mt-4">

@@ -1,12 +1,12 @@
 import React from 'react';
 import { TailSpin } from 'react-loader-spinner';
 
-const LoaderComp = () => {
+const LoaderComp = (props) => {
     return (
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
             <TailSpin
-                height="80"
-                width="80"
+                height={props.name === "first" ? "80" : "40"}
+                width={props.name === "first" ? "80" : "40"}
                 color="black"
                 ariaLabel="tail-spin-loading"
                 radius="1"
